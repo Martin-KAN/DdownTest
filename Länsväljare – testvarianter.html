@@ -1,0 +1,613 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Länsväljare – testvarianter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: moderator-ram (variantnav + testledarpanel) runt ett realistiskt filterkort ur lönetjänsten */
+:root{
+  --bg:#f2f5f5; --surface:#ffffff; --surface-2:#f7f9f9; --ink:#14232a; --muted:#5a6b72; --line:#d3dcdf;
+  --accent:#0d6072; --accent-ink:#ffffff; --accent-soft:#e0eef1; --chip:#e5eef0;
+  --ok:#1d7742; --warn:#9a520e; --bad:#b0281f; --shadow:0 10px 30px rgba(14,40,48,.14);
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1618; --surface:#162124; --surface-2:#1b282b; --ink:#e3ecee; --muted:#93a6ac; --line:#2a3a3e;
+  --accent:#62bccc; --accent-ink:#05252c; --accent-soft:#1c3a40; --chip:#213439;
+  --ok:#5cc58a; --warn:#e3a35a; --bad:#f08a80; --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1618; --surface:#162124; --surface-2:#1b282b; --ink:#e3ecee; --muted:#93a6ac; --line:#2a3a3e;
+  --accent:#62bccc; --accent-ink:#05252c; --accent-soft:#1c3a40; --chip:#213439;
+  --ok:#5cc58a; --warn:#e3a35a; --bad:#f08a80; --shadow:0 10px 30px rgba(0,0,0,.5); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);padding-inline:16px;padding-block:20px 48px}
+body.noscroll{overflow:hidden}
+.wrap{max-width:980px;margin:0 auto;display:grid;gap:20px}
+h1{font-size:clamp(22px,4vw,30px);line-height:1.15;margin:0;text-wrap:balance;font-weight:700;letter-spacing:-.01em}
+.lede{margin:6px 0 0;color:var(--muted);max-width:62ch}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Variant nav */
+.vnav{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.vbtn{flex:0 0 auto;display:flex;gap:8px;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px 7px 8px;cursor:pointer;white-space:nowrap}
+.vbtn .n{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--chip);font:500 12px var(--f-mono)}
+.vbtn[aria-current="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.vbtn[aria-current="true"] .n{background:var(--accent-ink);color:var(--accent)}
+.vdesc{margin:0;color:var(--muted);font-size:14px;max-width:70ch}
+.vdesc b{color:var(--ink);font-weight:600}
+
+.stagegrid{display:grid;grid-template-columns:minmax(0,520px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.stagegrid{grid-template-columns:minmax(0,1fr)}}
+
+/* Task banner */
+.taskbanner{background:var(--accent-soft);border:1px solid var(--accent);border-radius:var(--r);padding:12px 14px;font-weight:600;margin-bottom:12px}
+.taskbanner small{display:block;font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+
+/* Mock filter card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:16px}
+.card h2{margin:0;font-size:18px}
+.card .sub{margin:-12px 0 0;color:var(--muted);font-size:13px}
+.static{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.flabel{display:block;font-size:13px;font-weight:600;margin-bottom:6px;padding:0}
+.fake{border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--surface-2);color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.field{position:relative}
+
+.native,.tinput,.trigger{width:100%;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:9px 12px}
+.native{appearance:auto}
+.tinput{padding-right:40px}
+.trigger{display:flex;justify-content:space-between;align-items:center;gap:8px;cursor:pointer;text-align:left}
+.trigger[aria-expanded="true"],.tinput:focus,.ms:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.trigger .tv{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chev{flex:0 0 auto;width:14px;height:14px;color:var(--muted)}
+.iconbtn{border:0;background:transparent;cursor:pointer;width:32px;height:32px;border-radius:6px;font-size:20px;line-height:1;color:var(--muted)}
+.iconbtn:hover{background:var(--chip)}
+.cb .clear{position:absolute;right:6px;top:6px}
+
+/* Lists / popovers */
+.pop{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);display:flex;flex-direction:column;max-height:380px;overflow:hidden}
+ul.pop{list-style:none;margin:0;padding:6px;overflow:auto;display:block;max-height:320px}
+.opt{display:flex;align-items:center;gap:8px;padding:10px 10px;border-radius:6px;cursor:pointer;min-height:44px}
+.opt.act,.opt:hover{background:var(--chip)}
+.opt[aria-selected="true"]{font-weight:600}
+.opt .ck{margin-left:auto;color:var(--accent);flex:0 0 auto}
+.hint{color:var(--muted);font-size:12px;font-weight:400}
+.hint::before{content:"· "}
+.empty{padding:12px;color:var(--muted);font-size:14px}
+.ghead{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:12px 10px 4px}
+
+.pop-search{padding:10px;border-bottom:1px solid var(--line)}
+.pop-search input{width:100%;min-height:40px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface-2)}
+.pop-list{overflow:auto;padding:6px;flex:1 1 auto}
+.row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;cursor:pointer;min-height:44px}
+.row:hover{background:var(--chip)}
+.row input{width:18px;height:18px;accent-color:var(--accent);flex:0 0 auto;margin:0}
+.row.all{border-bottom:1px solid var(--line);border-radius:6px 6px 0 0;margin-bottom:4px}
+.pop-foot{display:flex;gap:8px;justify-content:space-between;padding:10px;border-top:1px solid var(--line)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;cursor:pointer;min-height:42px;font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.small{min-height:34px;padding:5px 10px;font-size:13px}
+
+.backdrop{position:fixed;inset:0;background:rgba(5,20,25,.45);z-index:40}
+.pop.sheet{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:41;border-radius:16px 16px 0 0;max-height:82vh;padding-bottom:env(safe-area-inset-bottom,0px);animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.pop.sheet{animation:none}}
+.sheet-head{display:grid;grid-template-columns:32px 1fr 32px;align-items:center;padding:8px 10px 0;text-align:center}
+.grab{grid-column:1/-1;justify-self:center;width:40px;height:4px;border-radius:2px;background:var(--line);margin-bottom:6px}
+.sheet-head strong{grid-column:2}
+
+/* Multiselect chips */
+.ms{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:44px;border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--surface);cursor:text}
+.chips{display:contents}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--accent-soft);color:var(--ink);border-radius:6px;padding:2px 2px 2px 8px;font-size:14px;max-width:100%}
+.chip-x{border:0;background:transparent;cursor:pointer;width:26px;height:26px;border-radius:4px;font-size:16px;color:var(--muted)}
+.chip-x:hover{background:var(--chip)}
+.msinput{flex:1 1 120px;min-width:0;border:0;outline:0;background:transparent;padding:6px 4px}
+
+/* Pills */
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:14px;min-height:38px}
+.pill[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+
+/* Radios */
+fieldset.radios{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 18px}
+fieldset.radios legend{width:100%}
+.radio{display:flex;align-items:center;gap:8px;min-height:40px;cursor:pointer}
+.radio input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.v7sub{margin-top:10px}
+
+/* Tile map */
+.mapwrap{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:440px){.mapwrap{grid-template-columns:minmax(0,1fr)}}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,64px));grid-auto-rows:54px;gap:4px}
+.tile{border:1px solid var(--line);background:var(--surface-2);border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px;min-width:0;gap:1px}
+.tile b{font:500 14px var(--f-mono)}
+.tile span{font-size:10px;line-height:1.1;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tile[aria-pressed="true"] span{color:var(--accent-ink)}
+.note{font-size:12px;color:var(--muted);margin:8px 0 0}
+
+/* Result */
+.result{border-top:1px solid var(--line);padding-top:14px}
+.result .lbl{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.result .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;margin:2px 0}
+.result .where{font-weight:600}
+.cmp{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
+.cmp li{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums;padding:6px 0;border-bottom:1px dashed var(--line)}
+.cmp .bar{flex:1;align-self:center;height:6px;border-radius:3px;background:var(--chip);position:relative;max-width:140px}
+.cmp .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--accent)}
+.cmp .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto}
+.demo{font-size:12px;color:var(--muted)}
+
+/* Moderator panel */
+.mod{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px 18px 16px}
+.mod summary{cursor:pointer;font-weight:700;padding:12px 0;list-style-position:inside}
+.mod h3{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);flex:0 0 auto}
+.chk small{display:block;color:var(--muted)}
+.chk.off{opacity:.5}
+.taskctl select{width:100%;min-height:40px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--surface)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.live{font:500 14px var(--f-mono);margin-top:10px;font-variant-numeric:tabular-nums}
+.live.run{color:var(--accent)}
+.lastres{margin-top:8px;font-size:14px;font-weight:600}
+.r-ok{color:var(--ok)} .r-bad{color:var(--bad)} .r-warn{color:var(--warn)}
+.logwrap{overflow-x:auto;margin-top:6px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-weight:600;color:var(--muted)}
+.tsv{width:100%;min-height:90px;margin-top:8px;font:12px var(--f-mono);border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--surface-2)}
+.muted{color:var(--muted);font-size:13px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Länsväljare – testvarianter</h1>
+    <p class="lede">Åtta sätt att välja område i lönestatistiken. Testet ska svara på om möjligheten att välja flera län är värd den komplexitet den ger. Öppna på mobil och desktop. Valet syns direkt i resultatrutan.</p>
+  </header>
+
+  <nav class="vnav" id="vnav" aria-label="Varianter"></nav>
+  <p class="vdesc" id="vdesc"></p>
+
+  <div class="stagegrid">
+    <div>
+      <div class="taskbanner" id="taskBanner" hidden><small>Din uppgift</small><span id="taskText"></span></div>
+      <section class="card" aria-labelledby="cardTitle">
+        <h2 id="cardTitle">Jämför löner</h2>
+        <p class="sub">Exempelvy ur lönetjänsten. Bara Område går att ändra.</p>
+        <div class="static">
+          <div><span class="flabel">Yrke</span><div class="fake">Grundskolelärare 7–9</div></div>
+          <div><span class="flabel">Avtal</span><div class="fake">Kommun</div></div>
+        </div>
+        <div id="field"></div>
+        <div class="result" id="result" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <details class="mod" id="mod" open>
+      <summary>Testledare</summary>
+      <h3>Inställningar</h3>
+      <label class="chk" id="multiRow"><input type="checkbox" id="optMulti" checked><span>Tillåt flera val<small id="multiNote">Gäller variant 4–8. Stäng av för att testa samma mönster med bara ett val.</small></span></label>
+      <label class="chk"><input type="checkbox" id="optShort"><span>Kortnamn utan ”län”<small>”Värmland” i stället för ”Värmlands län”.</small></span></label>
+
+      <h3>Uppgift</h3>
+      <div class="taskctl">
+        <label for="taskSel" class="flabel">Välj uppgift och läs upp den</label>
+        <select id="taskSel"></select>
+        <div class="btns">
+          <button class="btn primary" id="tStart" type="button">Starta</button>
+          <button class="btn" id="tDone" type="button" disabled>Klar</button>
+          <button class="btn" id="tGive" type="button" disabled>Gav upp</button>
+        </div>
+        <div class="live" id="tLive">0,0 s · 0 tryck</div>
+        <div class="lastres" id="tLast"></div>
+      </div>
+
+      <h3>Logg</h3>
+      <div class="logwrap"><table><thead><tr><th>Var.</th><th>Flera</th><th>Uppgift</th><th>Tid</th><th>Tryck</th><th>Resultat</th></tr></thead><tbody id="logBody"></tbody></table></div>
+      <p class="muted" id="logEmpty">Inga körningar än. Loggen sparas bara i den här webbläsaren.</p>
+      <div class="btns">
+        <button class="btn small" id="logCopy" type="button">Kopiera som tabell</button>
+        <button class="btn small" id="logClear" type="button">Rensa logg</button>
+      </div>
+      <textarea class="tsv" id="tsvOut" hidden readonly aria-label="Logg som tabbseparerad text"></textarea>
+    </details>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fold=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const CHECK='<svg class="ck" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+const CHEV='<svg class="chev" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+
+// [länsbokstav, namn, kortnamn, landsdel, orter/alias, [kolumn, rad] i schematisk karta]
+const RAW=[
+ ['AB','Stockholms län','Stockholm','Svealand',['sthlm','solna','södertälje','nacka','huddinge'],[3,5]],
+ ['C','Uppsala län','Uppsala','Svealand',['enköping'],[3,4]],
+ ['D','Södermanlands län','Södermanland','Svealand',['sörmland','eskilstuna','nyköping','katrineholm'],[2,5]],
+ ['E','Östergötlands län','Östergötland','Götaland',['linköping','norrköping','motala'],[1,5]],
+ ['F','Jönköpings län','Jönköping','Götaland',['värnamo','nässjö'],[1,6]],
+ ['G','Kronobergs län','Kronoberg','Götaland',['växjö','ljungby'],[1,7]],
+ ['H','Kalmar län','Kalmar','Götaland',['öland','västervik','oskarshamn'],[2,6]],
+ ['I','Gotlands län','Gotland','Götaland',['visby'],[3,6]],
+ ['K','Blekinge län','Blekinge','Götaland',['karlskrona','karlshamn'],[2,7]],
+ ['M','Skåne län','Skåne','Götaland',['malmö','lund','helsingborg','kristianstad'],[0,7]],
+ ['N','Hallands län','Halland','Götaland',['halmstad','varberg','kungsbacka'],[0,6]],
+ ['O','Västra Götalands län','Västra Götaland','Götaland',['göteborg','gbg','borås','trollhättan','skövde'],[0,5]],
+ ['S','Värmlands län','Värmland','Svealand',['karlstad','arvika'],[0,4]],
+ ['T','Örebro län','Örebro','Svealand',['karlskoga'],[1,4]],
+ ['U','Västmanlands län','Västmanland','Svealand',['västerås','köping'],[2,4]],
+ ['W','Dalarnas län','Dalarna','Svealand',['falun','borlänge','mora'],[1,3]],
+ ['X','Gävleborgs län','Gävleborg','Norrland',['gävle','hudiksvall','sandviken'],[2,3]],
+ ['Y','Västernorrlands län','Västernorrland','Norrland',['sundsvall','härnösand','örnsköldsvik'],[2,2]],
+ ['Z','Jämtlands län','Jämtland','Norrland',['östersund','åre'],[1,2]],
+ ['AC','Västerbottens län','Västerbotten','Norrland',['umeå','skellefteå','lycksele'],[2,1]],
+ ['BD','Norrbottens län','Norrbotten','Norrland',['luleå','kiruna','piteå','boden'],[3,0]],
+];
+const LAN=RAW.map(([code,name,short,del,alias,pos])=>({code,name,short,del,alias,pos}));
+const BY=Object.fromEntries(LAN.map(l=>[l.code,l]));
+const coll=new Intl.Collator('sv');
+const SORTED=[...LAN].sort((a,b)=>coll.compare(a.name,b.name));
+const ORDER=Object.fromEntries(SORTED.map((l,i)=>[l.code,i]));
+const GROUPS=['Norrland','Svealand','Götaland'];
+
+const S={v:1,sel:[],short:false,multi:true};
+let cur={};
+
+const lbl=l=>S.short?l.short:l.name;
+const sortIds=a=>[...a].sort((x,y)=>ORDER[x]-ORDER[y]);
+const isSel=id=>id==='ALL'?!S.sel.length:S.sel.includes(id);
+function summary(sel){
+  if(!sel.length) return 'Hela Sverige';
+  if(sel.length<=2) return sel.map(id=>lbl(BY[id])).join(', ');
+  return `${lbl(BY[sel[0]])} + ${sel.length-1} till`;
+}
+function toggle(sel,id,multi){
+  if(id==='ALL') return [];
+  if(!multi) return [id];
+  const s=new Set(sel); s.has(id)?s.delete(id):s.add(id); return sortIds(s);
+}
+function showAll(f){return !f||'hela sverige'.startsWith(f)||'sverige'.startsWith(f)}
+function search(q){
+  const f=fold(q.trim());
+  if(!f) return SORTED.map(l=>({l}));
+  const out=[];
+  for(const l of SORTED){
+    const n=fold(l.name);
+    if(n.startsWith(f)||n.split(/[\s-]+/).some(w=>w.startsWith(f))) out.push({l,s:0});
+    else{const a=l.alias.find(a=>fold(a).startsWith(f)); if(a) out.push({l,s:1,hint:a[0].toUpperCase()+a.slice(1)});}
+  }
+  return out.sort((a,b)=>a.s-b.s);
+}
+
+function commit(sel){S.sel=sel; renderResult(); cur.sync&&cur.sync();}
+
+/* ---------- 1. Vanlig dropdown ---------- */
+function v1(el){
+  el.innerHTML=`<label class="flabel" for="v1s">Område</label>
+  <select id="v1s" class="native"><option value="ALL">Hela Sverige</option>${SORTED.map(l=>`<option value="${l.code}">${esc(lbl(l))}</option>`).join('')}</select>`;
+  const s=el.querySelector('select');
+  s.addEventListener('change',()=>commit(s.value==='ALL'?[]:[s.value]));
+  const sync=()=>{s.value=S.sel[0]||'ALL'}; sync(); return {sync};
+}
+
+/* ---------- 2. Kombobox med sök, ett val ---------- */
+function v2(el){
+  el.innerHTML=`<label class="flabel" for="v2i">Område</label>
+  <div class="field cb"><input id="v2i" class="tinput" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="v2l" autocomplete="off" placeholder="Sök län eller ort">
+  <button type="button" class="iconbtn clear" aria-label="Återställ till Hela Sverige" hidden>×</button>
+  <ul id="v2l" class="pop" role="listbox" hidden></ul></div>`;
+  const inp=el.querySelector('input'),ul=el.querySelector('ul'),clr=el.querySelector('.clear');
+  let items=[],act=-1;
+  const sync=()=>{inp.value=S.sel.length?lbl(BY[S.sel[0]]):'Hela Sverige'; clr.hidden=!S.sel.length;};
+  function build(q){
+    const f=fold(q.trim()); items=[];
+    if(showAll(f)) items.push({id:'ALL',text:'Hela Sverige'});
+    search(q).forEach(r=>items.push({id:r.l.code,text:lbl(r.l),hint:r.hint}));
+    act=f?(items.length?0:-1):Math.max(0,items.findIndex(i=>isSel(i.id)));
+    draw();
+  }
+  function draw(){
+    ul.hidden=false; inp.setAttribute('aria-expanded','true');
+    ul.innerHTML=items.length?items.map((it,i)=>`<li role="option" id="v2o${i}" data-id="${it.id}" class="opt${i===act?' act':''}" aria-selected="${isSel(it.id)}">${esc(it.text)}${it.hint?`<span class="hint">${esc(it.hint)}</span>`:''}${isSel(it.id)?CHECK:''}</li>`).join('')
+      :`<li class="empty">Inget län matchar ”${esc(inp.value)}”. Prova en ort, till exempel Göteborg.</li>`;
+    if(act>=0){inp.setAttribute('aria-activedescendant','v2o'+act); ul.querySelector('.act')?.scrollIntoView({block:'nearest'});}
+    else inp.removeAttribute('aria-activedescendant');
+  }
+  function close(){ul.hidden=true; inp.setAttribute('aria-expanded','false'); inp.removeAttribute('aria-activedescendant'); sync();}
+  function pick(id){commit(id==='ALL'?[]:[id]); close(); inp.blur();}
+  inp.addEventListener('focus',()=>{build(''); requestAnimationFrame(()=>inp.select());});
+  inp.addEventListener('input',()=>build(inp.value));
+  inp.addEventListener('blur',()=>setTimeout(()=>{if(document.activeElement!==inp) close();},150));
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){e.preventDefault(); if(ul.hidden) build(''); else{act=Math.min(items.length-1,act+1); draw();}}
+    else if(e.key==='ArrowUp'){e.preventDefault(); act=Math.max(0,act-1); draw();}
+    else if(e.key==='Enter'){e.preventDefault(); if(act>=0&&items[act]) pick(items[act].id);}
+    else if(e.key==='Escape'){close();}
+  });
+  ul.addEventListener('mousedown',e=>e.preventDefault());
+  ul.addEventListener('click',e=>{const li=e.target.closest('[data-id]'); if(li) pick(li.dataset.id);});
+  clr.addEventListener('click',()=>{commit([]);});
+  sync(); return {sync};
+}
+
+/* ---------- 3. Multiselect med sök och chips ---------- */
+function v3(el){
+  el.innerHTML=`<label class="flabel" for="v3i">Område</label>
+  <div class="field"><div class="ms"><span class="chips"></span><input id="v3i" class="msinput" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="v3l" autocomplete="off"></div>
+  <ul id="v3l" class="pop" role="listbox" aria-multiselectable="true" hidden></ul></div>`;
+  const box=el.querySelector('.ms'),chips=el.querySelector('.chips'),inp=el.querySelector('input'),ul=el.querySelector('ul');
+  let items=[],act=-1,open=false;
+  function sync(){
+    chips.innerHTML=S.sel.map(id=>`<span class="chip">${esc(lbl(BY[id]))}<button type="button" class="chip-x" data-id="${id}" aria-label="Ta bort ${esc(lbl(BY[id]))}">×</button></span>`).join('');
+    inp.placeholder=S.sel.length?'Lägg till län':'Hela Sverige – sök för att välja län';
+    if(open) draw();
+  }
+  function build(q){
+    const f=fold(q.trim()); items=[];
+    if(showAll(f)) items.push({id:'ALL',text:'Hela Sverige'});
+    search(q).forEach(r=>items.push({id:r.l.code,text:lbl(r.l),hint:r.hint}));
+    act=f&&items.length?0:-1; draw();
+  }
+  function draw(){
+    open=true; ul.hidden=false; inp.setAttribute('aria-expanded','true');
+    ul.innerHTML=items.length?items.map((it,i)=>`<li role="option" id="v3o${i}" data-id="${it.id}" class="opt${i===act?' act':''}" aria-selected="${isSel(it.id)}">${esc(it.text)}${it.hint?`<span class="hint">${esc(it.hint)}</span>`:''}${isSel(it.id)?CHECK:''}</li>`).join('')
+      :`<li class="empty">Inget län matchar ”${esc(inp.value)}”.</li>`;
+    if(act>=0){inp.setAttribute('aria-activedescendant','v3o'+act); ul.querySelector('.act')?.scrollIntoView({block:'nearest'});}
+  }
+  function close(){open=false; ul.hidden=true; inp.setAttribute('aria-expanded','false'); inp.value='';}
+  function pick(id){const keep=ul.scrollTop; commit(toggle(S.sel,id,true)); inp.value=''; build(''); ul.scrollTop=keep;}
+  box.addEventListener('click',e=>{if(!e.target.closest('.chip-x')) inp.focus();});
+  chips.addEventListener('click',e=>{const b=e.target.closest('.chip-x'); if(b){e.stopPropagation(); commit(S.sel.filter(x=>x!==b.dataset.id));}});
+  inp.addEventListener('focus',()=>build(inp.value));
+  inp.addEventListener('input',()=>build(inp.value));
+  inp.addEventListener('blur',()=>setTimeout(()=>{if(document.activeElement!==inp) close();},150));
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'){e.preventDefault(); act=Math.min(items.length-1,act+1); draw();}
+    else if(e.key==='ArrowUp'){e.preventDefault(); act=Math.max(0,act-1); draw();}
+    else if(e.key==='Enter'){e.preventDefault(); if(act>=0&&items[act]) pick(items[act].id);}
+    else if(e.key==='Escape'){close(); inp.blur();}
+    else if(e.key==='Backspace'&&!inp.value&&S.sel.length){commit(S.sel.slice(0,-1));}
+  });
+  ul.addEventListener('mousedown',e=>e.preventDefault());
+  ul.addEventListener('click',e=>{const li=e.target.closest('[data-id]'); if(li) pick(li.dataset.id);});
+  sync(); return {sync};
+}
+
+/* ---------- Panel (4, 5, 7) ---------- */
+const mq=matchMedia('(max-width:720px)');
+function panel(el,{id,grouped,sheet,label='Område'}){
+  el.innerHTML=`<span class="flabel" id="${id}-l">${label}</span>
+  <div class="field"><button type="button" class="trigger" aria-haspopup="dialog" aria-expanded="false" aria-labelledby="${id}-l ${id}-v"><span class="tv" id="${id}-v"></span>${CHEV}</button><div class="popwrap"></div></div>`;
+  const t=el.querySelector('.trigger'),wrap=el.querySelector('.popwrap');
+  let open=false,pending=[],q='';
+  const sync=()=>{t.querySelector('.tv').textContent=summary(S.sel);};
+  function outside(e){if(!el.contains(e.target)) close();}
+  function close(){
+    if(!open) return; open=false; wrap.innerHTML=''; t.setAttribute('aria-expanded','false');
+    document.removeEventListener('pointerdown',outside,true); document.body.classList.remove('noscroll');
+  }
+  function row(code,text,hint,checked,cls=''){
+    return `<label class="row ${cls}"><input type="${S.multi?'checkbox':'radio'}" name="${id}-r" value="${code}"${checked?' checked':''}><span>${esc(text)}${hint?` <span class="hint">${esc(hint)}</span>`:''}</span></label>`;
+  }
+  function renderList(){
+    const list=wrap.querySelector('.pop-list'),keep=list.scrollTop,f=fold(q.trim());
+    const res=search(q); let h='';
+    if(showAll(f)) h+=row('ALL','Hela Sverige','',!pending.length,'all');
+    if(grouped){
+      GROUPS.forEach(g=>{const rs=res.filter(r=>r.l.del===g); if(rs.length) h+=`<div class="ghead">${g}</div>`+rs.map(r=>row(r.l.code,lbl(r.l),r.hint,pending.includes(r.l.code))).join('');});
+    } else h+=res.map(r=>row(r.l.code,lbl(r.l),r.hint,pending.includes(r.l.code))).join('');
+    if(!res.length&&!showAll(f)) h=`<div class="empty">Inget län matchar ”${esc(q)}”. Prova en ort, till exempel Göteborg.</div>`;
+    list.innerHTML=h; list.scrollTop=keep;
+    const ok=wrap.querySelector('.ok'); if(ok) ok.textContent=pending.length?`Visa ${pending.length} län`:'Visa Hela Sverige';
+  }
+  function openP(){
+    open=true; pending=[...S.sel]; q='';
+    const sm=sheet&&mq.matches;
+    t.setAttribute('aria-expanded','true');
+    wrap.innerHTML=`${sm?'<div class="backdrop"></div>':''}<div class="pop${sm?' sheet':''}" role="dialog" aria-label="Välj ${label.toLowerCase()}">
+      ${sm?'<div class="sheet-head"><div class="grab"></div><strong>Välj område</strong><button type="button" class="iconbtn x" aria-label="Stäng">×</button></div>':''}
+      <div class="pop-search"><input type="search" id="${id}-q" placeholder="Sök län eller ort" autocomplete="off" aria-label="Sök län eller ort"></div>
+      <div class="pop-list"></div>
+      ${S.multi?'<div class="pop-foot"><button type="button" class="btn clr">Rensa</button><button type="button" class="btn primary ok"></button></div>':''}
+    </div>`;
+    renderList();
+    const qi=wrap.querySelector('input[type=search]');
+    if(!sm) qi.focus();
+    qi.addEventListener('input',()=>{q=qi.value; renderList();});
+    wrap.querySelector('.pop-list').addEventListener('change',e=>{
+      const v=e.target.value;
+      if(!S.multi){commit(v==='ALL'?[]:[v]); close(); t.focus(); return;}
+      pending=toggle(pending,v,true); renderList();
+    });
+    wrap.querySelector('.ok')?.addEventListener('click',()=>{commit(pending); close(); t.focus();});
+    wrap.querySelector('.clr')?.addEventListener('click',()=>{pending=[]; renderList();});
+    wrap.querySelector('.backdrop')?.addEventListener('click',close);
+    wrap.querySelector('.x')?.addEventListener('click',close);
+    wrap.addEventListener('keydown',e=>{if(e.key==='Escape'){close(); t.focus();}});
+    document.addEventListener('pointerdown',outside,true);
+    if(sm) document.body.classList.add('noscroll');
+  }
+  t.addEventListener('click',()=>open?close():openP());
+  sync(); return {sync,close};
+}
+const v4=el=>panel(el,{id:'v4',grouped:false,sheet:false});
+const v5=el=>panel(el,{id:'v5',grouped:true,sheet:true});
+
+/* ---------- 6. Synliga pills ---------- */
+function v6(el){
+  const pill=(id,t,on)=>`<button type="button" class="pill" data-id="${id}" aria-pressed="${on}">${esc(t)}</button>`;
+  function sync(){
+    el.innerHTML=`<span class="flabel" id="v6l">Område</span><div class="pills" role="group" aria-labelledby="v6l">${pill('ALL','Hela Sverige',!S.sel.length)}${SORTED.map(l=>pill(l.code,lbl(l),S.sel.includes(l.code))).join('')}</div>`;
+  }
+  el.addEventListener('click',e=>{const b=e.target.closest('[data-id]'); if(b){const id=b.dataset.id; commit(toggle(S.sel,id,S.multi)); el.querySelector(`[data-id="${id}"]`)?.focus();}});
+  sync(); return {sync};
+}
+
+/* ---------- 7. Tvåsteg ---------- */
+function v7(el){
+  el.innerHTML=`<fieldset class="radios"><legend class="flabel">Område</legend>
+    <label class="radio"><input type="radio" name="v7m" value="all"> Hela Sverige</label>
+    <label class="radio"><input type="radio" name="v7m" value="lan"> Välj län</label></fieldset>
+    <div class="v7sub" hidden></div>`;
+  const subEl=el.querySelector('.v7sub');
+  let mode=S.sel.length?'lan':'all';
+  const sub=panel(subEl,{id:'v7p',grouped:false,sheet:true,label:S.multi?'Län':'Län'});
+  function sync(){
+    if(S.sel.length) mode='lan';
+    el.querySelector(`input[value="${mode}"]`).checked=true;
+    subEl.hidden=mode!=='lan'; sub.sync();
+  }
+  el.querySelector('fieldset').addEventListener('change',e=>{
+    mode=e.target.value;
+    if(mode==='all'){sub.close(); commit([]);} else sync();
+  });
+  sync(); return {sync};
+}
+
+/* ---------- 8. Schematisk karta ---------- */
+function v8(el){
+  function sync(){
+    const chosen=S.sel.length?S.sel.map(id=>esc(lbl(BY[id]))).join(', '):'Hela Sverige';
+    el.innerHTML=`<span class="flabel" id="v8l">Område</span>
+    <div class="mapwrap">
+      <div class="tiles" role="group" aria-labelledby="v8l">${LAN.map(l=>`<button type="button" class="tile" data-id="${l.code}" style="grid-column:${l.pos[0]+1};grid-row:${l.pos[1]+1}" aria-pressed="${S.sel.includes(l.code)}" aria-label="${esc(l.name)}" title="${esc(l.name)}"><b>${l.code}</b><span>${esc(l.short)}</span></button>`).join('')}</div>
+      <div><button type="button" class="pill" data-id="ALL" aria-pressed="${!S.sel.length}">Hela Sverige</button>
+        <p class="note"><b>Valt:</b> ${chosen}</p>
+        <p class="note">Schematisk karta. Varje ruta är ett län, placerad ungefär där länet ligger. Bokstaven är länsbokstaven.</p></div>
+    </div>`;
+  }
+  el.addEventListener('click',e=>{const b=e.target.closest('[data-id]'); if(b){const id=b.dataset.id; commit(toggle(S.sel,id,S.multi)); el.querySelector(`[data-id="${id}"]`)?.focus();}});
+  sync(); return {sync};
+}
+
+const VARIANTS=[
+ {n:'Vanlig dropdown',fn:v1,multi:false,d:'Webbläsarens egen select. Ett val. På mobil öppnas telefonens väljare.'},
+ {n:'Sök, ett val',fn:v2,multi:false,d:'Kombobox där listan filtreras när man skriver. Hittar även orter, t.ex. ”Göteborg” eller ”Umeå”.'},
+ {n:'Multiselect + chips',fn:v3,multi:true,d:'Ungefär som dagens lösning, men tryckvänlig. Valen läggs som chips i fältet, listan stannar öppen.'},
+ {n:'Panel med kryssrutor',fn:v4,multi:'opt',d:'En knapp öppnar en panel med sök och kryssrutor. Valet gäller först när man trycker på Visa.'},
+ {n:'Bottom sheet, grupperad',fn:v5,multi:'opt',d:'Samma som 4 men grupperad på landsdel. På mobil (under 720 px) glider panelen upp nerifrån.'},
+ {n:'Synliga pills',fn:v6,multi:'opt',d:'Alla län syns direkt som knappar. Inga dolda steg.'},
+ {n:'Tvåsteg',fn:v7,multi:'opt',d:'Först Hela Sverige eller Välj län. Länslistan visas bara för den som behöver den.'},
+ {n:'Schematisk karta',fn:v8,multi:'opt',d:'Klicka på län i en förenklad karta. Testar om geografin hjälper eller stör.'},
+];
+const variantMulti=()=>{const m=VARIANTS[S.v-1].multi; return m==='opt'?S.multi:m;};
+
+/* ---------- Resultat (exempeldata) ---------- */
+function median(code){
+  if(code==='ALL') return 36700;
+  let h=0; for(const c of code) h=(h*31+c.charCodeAt(0))%9973;
+  const base={AB:39400,O:37100,M:36800,C:37600}[code];
+  return base||Math.round((34200+(h*137)%3400)/100)*100;
+}
+const kr=n=>n.toLocaleString('sv-SE')+' kr';
+function renderResult(){
+  const r=$('#result'),sel=S.sel;
+  if(sel.length<=1){
+    const id=sel[0]||'ALL';
+    r.innerHTML=`<div class="lbl">Medianlön</div><div class="big">${kr(median(id))}</div><div>i <span class="where">${esc(id==='ALL'?'Hela Sverige':lbl(BY[id]))}</span></div><div class="demo">Exempeldata för testet</div>`;
+  } else {
+    const vals=sel.map(id=>({id,m:median(id)})),max=Math.max(...vals.map(v=>v.m)),min=Math.min(...vals.map(v=>v.m))-1500;
+    r.innerHTML=`<div class="lbl">Medianlön · ${sel.length} län</div><ul class="cmp">${vals.map(v=>`<li><span class="nm">${esc(lbl(BY[v.id]))}</span><span class="bar"><i style="width:${Math.round((v.m-min)/(max-min)*100)}%"></i></span><b>${kr(v.m)}</b></li>`).join('')}</ul><div class="demo">Exempeldata för testet</div>`;
+  }
+}
+
+/* ---------- Nav + mount ---------- */
+function mount(){
+  const f=$('#field'); f.innerHTML=''; const d=document.createElement('div'); f.appendChild(d);
+  cur=VARIANTS[S.v-1].fn(d)||{};
+  renderResult(); updateNav();
+}
+function updateNav(){
+  $('#vnav').querySelectorAll('.vbtn').forEach((b,i)=>b.setAttribute('aria-current',String(i+1===S.v)));
+  const V=VARIANTS[S.v-1],m=V.multi==='opt'?(S.multi?'ja (inställning)':'nej (inställning)'):(V.multi?'ja':'nej');
+  $('#vdesc').innerHTML=`<b>${S.v}. ${V.n}.</b> ${V.d} Flera val: ${m}.`;
+  const opt=V.multi==='opt'; $('#optMulti').disabled=!opt; $('#multiRow').classList.toggle('off',!opt);
+}
+$('#vnav').innerHTML=VARIANTS.map((v,i)=>`<button type="button" class="vbtn" data-v="${i+1}"><span class="n">${i+1}</span>${v.n}</button>`).join('');
+$('#vnav').addEventListener('click',e=>{const b=e.target.closest('[data-v]'); if(!b) return; abortTask(); S.v=+b.dataset.v; S.sel=[]; try{history.replaceState(null,'','#v'+S.v)}catch(_){} mount();});
+$('#optShort').addEventListener('change',e=>{S.short=e.target.checked; mount();});
+$('#optMulti').addEventListener('change',e=>{S.multi=e.target.checked; abortTask(); if(!S.multi&&S.sel.length>1) S.sel=S.sel.slice(0,1); mount();});
+
+/* ---------- Testuppgifter ---------- */
+const TASKS=[
+ {id:'t1',text:'Visa lönestatistiken för Värmland.',start:[],expect:['S']},
+ {id:'t2',text:'Jämför lönerna i Skåne och Halland.',start:[],expect:['M','N'],needsMulti:true},
+ {id:'t3',text:'Du tittar på Skåne. Byt till hela landet.',start:['M'],expect:[]},
+ {id:'t4',text:'Visa statistiken för länet där Göteborg ligger.',start:[],expect:['O']},
+ {id:'t5',text:'Du tittar på Stockholm och Uppsala. Ta bort Uppsala.',start:['AB','C'],expect:['AB'],needsMulti:true},
+];
+$('#taskSel').innerHTML=TASKS.map((t,i)=>`<option value="${i}">${i+1}. ${t.text}</option>`).join('');
+let run=null,timer=null;
+function liveTxt(){if(!run) return; const s=(performance.now()-run.t0)/1000; $('#tLive').textContent=`${s.toFixed(1).replace('.',',')} s · ${run.taps} tryck`;}
+$('#field').addEventListener('pointerdown',()=>{if(run){run.taps++; liveTxt();}},true);
+document.addEventListener('pointerdown',e=>{if(run&&e.target.closest('.pop.sheet,.backdrop')&&!$('#field').contains(e.target)){run.taps++; liveTxt();}},true);
+function startTask(){
+  const T=TASKS[+$('#taskSel').value];
+  S.sel=[...T.start];
+  if(!variantMulti()&&S.sel.length>1) S.sel=S.sel.slice(0,1);
+  mount();
+  run={T,t0:performance.now(),taps:0};
+  $('#taskText').textContent=T.text; $('#taskBanner').hidden=false;
+  $('#tStart').disabled=true; $('#tDone').disabled=false; $('#tGive').disabled=false;
+  $('#tLive').classList.add('run'); $('#tLast').textContent='';
+  timer=setInterval(liveTxt,100); liveTxt();
+}
+function stopUI(){clearInterval(timer); timer=null; $('#tStart').disabled=false; $('#tDone').disabled=true; $('#tGive').disabled=true; $('#tLive').classList.remove('run'); $('#taskBanner').hidden=true;}
+function abortTask(){if(run){run=null; stopUI(); $('#tLast').textContent='Uppgiften avbröts.'; $('#tLast').className='lastres r-warn';}}
+function finish(gaveUp){
+  if(!run) return;
+  const secs=(performance.now()-run.t0)/1000,T=run.T,m=variantMulti();
+  const ok=!gaveUp&&JSON.stringify(sortIds(S.sel))===JSON.stringify(sortIds(T.expect));
+  let res,cls;
+  if(ok){res='Lyckades';cls='r-ok';}
+  else if(T.needsMulti&&!m){res=gaveUp?'Gav upp (ej möjlig)':'Ej möjlig i varianten';cls='r-warn';}
+  else{res=gaveUp?'Gav upp':'Fel val';cls='r-bad';}
+  const entry={v:S.v,vn:VARIANTS[S.v-1].n,multi:m?'ja':'nej',task:TASKS.indexOf(T)+1,tt:T.text,secs:+secs.toFixed(1),taps:run.taps,res,chosen:summary(S.sel),ts:new Date().toLocaleString('sv-SE')};
+  LOG.push(entry); saveLog(); renderLog();
+  $('#tLast').textContent=`${res} · valt: ${entry.chosen}`; $('#tLast').className='lastres '+cls;
+  run=null; stopUI();
+}
+$('#tStart').addEventListener('click',startTask);
+$('#tDone').addEventListener('click',()=>finish(false));
+$('#tGive').addEventListener('click',()=>finish(true));
+
+/* ---------- Logg ---------- */
+const KEY='lansvaljare-logg-v1';
+let LOG=[]; try{LOG=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(_){LOG=[]}
+function saveLog(){try{localStorage.setItem(KEY,JSON.stringify(LOG))}catch(_){}}
+function renderLog(){
+  const cls=r=>r==='Lyckades'?'r-ok':r.includes('ej möjlig')||r.includes('Ej möjlig')?'r-warn':'r-bad';
+  $('#logBody').innerHTML=[...LOG].reverse().map(e=>`<tr><td>${e.v}</td><td>${e.multi}</td><td title="${esc(e.tt)}">${e.task}</td><td>${String(e.secs).replace('.',',')} s</td><td>${e.taps}</td><td class="${cls(e.res)}">${esc(e.res)}</td></tr>`).join('');
+  $('#logEmpty').hidden=LOG.length>0;
+}
+function tsv(){
+  const h=['Variant','Variantnamn','Flera val','Uppgift','Uppgiftstext','Tid (s)','Tryck','Resultat','Valt','Tidpunkt'];
+  return [h.join('\t'),...LOG.map(e=>[e.v,e.vn,e.multi,e.task,e.tt,String(e.secs).replace('.',','),e.taps,e.res,e.chosen,e.ts].join('\t'))].join('\n');
+}
+$('#logCopy').addEventListener('click',()=>{
+  const txt=tsv(),out=$('#tsvOut'),b=$('#logCopy');
+  const fallback=()=>{out.hidden=false; out.value=txt; out.focus(); out.select(); b.textContent='Markerat – kopiera med Cmd/Ctrl+C';};
+  try{navigator.clipboard.writeText(txt).then(()=>{b.textContent='Kopierat';setTimeout(()=>b.textContent='Kopiera som tabell',1800)},fallback);}catch(_){fallback();}
+});
+let clearArm=false;
+$('#logClear').addEventListener('click',()=>{
+  const b=$('#logClear');
+  if(!clearArm){clearArm=true; b.textContent='Tryck igen för att rensa'; setTimeout(()=>{clearArm=false; b.textContent='Rensa logg';},3000); return;}
+  LOG=[]; saveLog(); renderLog(); clearArm=false; b.textContent='Rensa logg'; $('#tsvOut').hidden=true;
+});
+
+/* ---------- Start ---------- */
+const m=/^#v([1-8])$/.exec(location.hash); if(m) S.v=+m[1];
+renderLog(); mount();
+})();
+</script>
+
+</body></html>
